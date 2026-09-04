@@ -1,0 +1,46 @@
+# hAI.WorldIntelMCP — stack deploybar per Portainer
+
+services:
+  world-intel-mcp:
+    image: ghcr.io/jbkunama1/hai.worldintelmcp:latest
+    container_name: world-intel-mcp
+    restart: unless-stopped
+
+    networks:
+      - highfishNetwork
+
+    ports:
+      - "8030:8030" # MCP-Endpoint (HTTP/OpenAPI via mcpo)
+      - "8501:8501" # Ops-Center-Dashboard (SSE-Live-Feeds)
+
+    # Cache (SQLite), Vektor-Store-Daten und Reports — überlebt Restarts
+    volumes:
+      - ./data:/data
+
+    environment:
+      MCP_HTTP_PORT: "${MCP_HTTP_PORT:-8030}"
+      DASHBOARD_PORT: "${DASHBOARD_PORT:-8501}"
+      # Leer = keine Auth. Bitte einen starken Wert setzen, wenn extern erreichbar!
+      MCP_API_KEY: "${MCP_API_KEY:-}"
+      # Collector-Daemon: füllt den Qdrant-Vektor-Store im 5-Min-Intervall
+      ENABLE_COLLECTOR: "${ENABLE_COLLECTOR:-false}"
+      # Nur mit Profil "vector" relevant
+      QDRANT_URL: "${QDRANT_URL:-}"
+      TZ: "${TZ:-Europe/Berlin}"
+
+  # --- Optional: Qdrant Vektor-Store für semantische Suche ---
+  # Aktivierung: docker compose --profile vector up -d
+  # plus QDRANT_URL=http://world-intel-qdrant:6333 in der .env
+  qdrant:
+    image: qdrant/qdrant:latest
+    container_name: world-intel-qdrant
+    restart: unless-stopped
+    profiles: ["vector"]
+    networks:
+      - highfishNetwork
+    volumes:
+      - ./data/qdrant:/qdrant/storage
+
+networks:
+  highfishNetwork:
+    external: true
