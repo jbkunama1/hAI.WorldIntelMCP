@@ -151,7 +151,7 @@
  </div>
  <div class="card">
  <h3>📘 OpenAPI optional</h3>
- <p>Mit <code>ENABLE_MCPO=true</code> startet zusätzlich <code>mcpo</code> auf <code>:8031</code>: jeder der 120 Tools als eigener REST-Endpunkt, Doku unter <code>/docs</code>, schützbar per <code>MCP_API_KEY</code>.</p>
+ <p>Mit <code>ENABLE_MCPO=true</code> startet zusätzlich <code>mcpo</code> — Port per <code>MCPO_PORT</code> frei wählbar: jeder der 120 Tools als eigener REST-Endpunkt, Doku unter <code>/docs</code>, schützbar per <code>MCP_API_KEY</code>.</p>
  </div>
  <div class="card">
  <h3>🗃 Qdrant Vektor-Store</h3>
@@ -159,7 +159,7 @@
  </div>
  <div class="card">
  <h3>🚀 Portainer + GHCR</h3>
- <p>Published als <code>ghcr.io/jbkunama1/hai.worldintelmcp:latest</code>, deploybar als Stack direkt aus dem Repository — inkl. Volume für Cache, Reports und Vektor-Store-Daten.</p>
+ <p>Published als <code>ghcr.io/jbkunama1/hai.worldintelmcp:latest</code>, deploybar als Stack direkt aus dem Repository — inkl. Volume für Cache, Reports und Vektor-Store-Daten. Alle Ports per Env konfigurierbar.</p>
  </div>
  </div>
  </div>
@@ -191,7 +191,7 @@ docker run -d --name world-intel-mcp \
 <section>
  <div class="wrap">
  <h2>🔧 Environment variables</h2>
- <p class="sub">Alle Variablen optional — Defaults funktionieren out of the box.</p>
+ <p class="sub">Alle Variablen optional — Defaults funktionieren out of the box. 💡 Port-Variablen steuern Host- und Container-Port gleichzeitig: beim Ändern einfach den Stack neu deployen.</p>
  <table>
  <tr><th>Variable</th><th>Pflicht</th><th>Default</th><th>Zweck</th></tr>
  <tr><td><var>MCP_HTTP_PORT</var></td><td>–</td><td>8030</td><td>🔌 Streamable-HTTP-Endpoint /mcp (supergateway)</td></tr>
@@ -233,7 +233,7 @@ docker run -d --name world-intel-mcp \
 <section>
  <div class="wrap">
  <h2>🔌 MCP-Clients anbinden</h2>
- <p class="sub">Streamable HTTP auf <span class="mono">:8030/mcp</span> für MCP-Clients — optional OpenAPI via mcpo auf <span class="mono">:8031</span>.</p>
+ <p class="sub">Streamable HTTP auf <span class="mono">:8030/mcp</span> für MCP-Clients — optional OpenAPI via mcpo auf <span class="mono">:8031</span> (Port per <span class="mono">MCPO_PORT</span> frei wählbar).</p>
  <div class="code"><pre>{
  "mcpServers": {
  "world-intel": {
@@ -244,7 +244,7 @@ docker run -d --name world-intel-mcp \
  }
  }
 }</pre></div>
- <p class="note">🔐 Der Streamable-Endpoint /mcp hat keine eigene Auth — nur im LAN oder hinter Cloudflare Access/Tunnel betreiben. Den optionalen OpenAPI-Endpoint (:8031) schützt <span class="mono">MCP_API_KEY</span> als Bearer-Token.</p>
+ <p class="note">🔐 Der Streamable-Endpoint /mcp hat keine eigene Auth — nur im LAN oder hinter Cloudflare Access/Tunnel betreiben. Den optionalen OpenAPI-Endpoint schützt <span class="mono">MCP_API_KEY</span> als Bearer-Token.</p>
  <div class="code"><pre><span style="color:var(--muted)"># CLI direkt im Container:</span>
 docker exec -it world-intel-mcp intel markets
 docker exec -it world-intel-mcp intel earthquakes --min-mag 5.0

@@ -24,7 +24,7 @@
 - [🌍 Überblick](#-überblick)
 - [✨ Domänen & Tools](#-domänen--tools)
 - [🚀 Installation](#-installation)
-- [🔧 Env-Variablen](#-env-variablen)
+- [🔧 Env-Variablen & Ports](#-env-variablen--ports)
 - [🔌 MCP-Clients anbinden](#-mcp-clients-anbinden)
 - [🗃 Qdrant & Collector](#-qdrant--collector)
 - [📟 Dashboard & CLI](#-dashboard--cli)
@@ -57,8 +57,8 @@ ACLED · GDELT · adsb.lol · OpenSky · Cloudflare Radar · WHO · NOAA · …
 |---|---|
 | 🐳 **Dockerfile** | Klont das Upstream-Projekt zur Build-Zeit (per `WORLD_INTEL_REF` pinbar), installiert `.[dashboard,vector]` + supergateway & mcpo |
 | 🔌 **supergateway** | Exponiert den stdio-Server als **Streamable HTTP** auf `:8030/mcp` — stateless, beliebig viele Clients parallel |
-| 📘 **mcpo (optional)** | OpenAPI-Endpoint auf `:8031`, schützbar per `MCP_API_KEY` |
-| 📦 **Portainer-Stack** | `docker-compose.yml` — deploybar direkt aus dem Repository |
+| 📘 **mcpo (optional)** | OpenAPI-Endpoint auf `:8031` (per `MCPO_PORT` frei wählbar), schützbar per `MCP_API_KEY` |
+| 📦 **Portainer-Stack** | `docker-compose.yml` — deploybar direkt aus dem Repository, **alle Ports per Env konfigurierbar** |
 | 🚀 **GHCR-Image** | GitHub Actions pusht nach `ghcr.io/jbkunama1/hai.worldintelmcp:latest` |
 | 🐖 **TruffleHog-Workflow** | Secret-Scan bei jedem Push/PR |
 | 🗃 **Qdrant (optional)** | Semantische Suche über angesammelte Intelligence (Profil `vector`) |
@@ -95,7 +95,7 @@ ACLED · GDELT · adsb.lol · OpenSky · Cloudflare Radar · WHO · NOAA · …
 1. **Stacks → Add stack → Repository** 📦
 2. Repository-URL: `https://github.com/jbkunama1/hAI.WorldIntelMCP.git`
 3. Compose-Pfad: `docker-compose.yml`, Branch: `main` 🌿
-4. Umgebungsvariablen setzen (siehe [🔧 Env-Variablen](#-env-variablen))
+4. Umgebungsvariablen setzen (siehe [🔧 Env-Variablen & Ports](#-env-variablen--ports)) — z. B. `ENABLE_MCPO=true` für den OpenAPI-Endpoint
 5. Docker-Netzwerk (falls nicht vorhanden):
 
 ```bash
@@ -133,7 +133,9 @@ Default ist `main` — mit `WORLD_INTEL_REF` auf jedes Tag des Upstream-Repos pi
 
 ---
 
-## 🔧 Env-Variablen
+## 🔧 Env-Variablen & Ports
+
+💡 **Port-Variablen steuern Host- und Container-Port gleichzeitig** — beim Ändern einfach den Stack neu deployen, die Compose muss nicht mehr angefasst werden.
 
 | Variable | Pflicht | Default | Zweck |
 |---|---|---|---|
@@ -145,6 +147,16 @@ Default ist `main` — mit `WORLD_INTEL_REF` auf jedes Tag des Upstream-Repos pi
 | `ENABLE_COLLECTOR` | – | `false` | 🔄 Collector-Daemon: füllt Qdrant im 5-Min-Intervall |
 | `QDRANT_URL` | – | *(leer)* | 🗃 z. B. `http://world-intel-qdrant:6333` (Profil `vector`) |
 | `TZ` | – | `Europe/Berlin` | 🕐 Zeitzone |
+
+### 📘 Beispiel: mcpo auf eigenem Port mit API-Key
+
+```text
+ENABLE_MCPO=true
+MCPO_PORT=9031
+MCP_API_KEY=dein-starker-key   # z. B. openssl rand -hex 32
+```
+
+→ OpenAPI-Doku: `http://<host>:9031/docs` · Beschreibung: `http://<host>:9031/openapi.json`
 
 ---
 
@@ -178,7 +190,7 @@ curl -s http://<host>:8030/mcp \
 
 ### 📘 OpenAPI (optional, für Agenten/OpenAPI-Clients)
 
-Mit `ENABLE_MCPO=true` startet zusätzlich **mcpo** auf `:8031` — jeder der 120 Tools wird als eigener REST-Endpunkt exponiert:
+Mit `ENABLE_MCPO=true` startet zusätzlich **mcpo** auf `:8031` (per `MCPO_PORT` frei wählbar) — jeder der 120 Tools wird als eigener REST-Endpunkt exponiert:
 
 - Doku: `http://<host>:8031/docs`
 - Beschreibung: `http://<host>:8031/openapi.json` — hier zeigen AnythingMCP & Co. hin
@@ -220,9 +232,9 @@ docker exec -it world-intel-mcp intel status
 |---|---|
 | 🔌 `Streamable HTTP error: {"detail":"Not Found"}` bzw. `POST /mcp → 404` | Client POSTet auf einen Pfad ohne MCP-Endpoint. Ursache: ältere Image-Version exponierte nur mcpo (OpenAPI). **Image neu pullen** (`docker pull ghcr.io/jbkunama1/hai.worldintelmcp:latest`) und Client-URL auf `http://<host>:8030/mcp` setzen |
 | ❌ Image-Pull schlägt fehl | GHCR-Paket im Repo (Packages) auf Public setzen oder per `docker login ghcr.io` einloggen |
-| 📟 Dashboard nicht erreichbar | Port 8501 frei? `DASHBOARD_PORT` prüfen, Container-Logs ansehen |
+| 📟 Dashboard nicht erreichbar | Port frei? `DASHBOARD_PORT` prüfen, Container-Logs ansehen |
 | 🔌 /mcp liefert Timeout beim Erstconnect | Erster Start initialisiert Quellen/Caches — kurz warten und erneut versuchen |
-| 🐳 Port schon belegt | `MCP_HTTP_PORT`/`DASHBOARD_PORT` ändern und Host-Port in der Compose anpassen |
+| 🐳 Port schon belegt | Env-Variable (`MCP_HTTP_PORT`/`MCPO_PORT`/`DASHBOARD_PORT`) ändern und Stack neu deployen — Host- und Container-Port folgen automatisch, keine Compose-Anpassung nötig |
 | 🗃 Qdrant-Verbindung fehlschlägt | Profil `vector` aktiv? `QDRANT_URL` korrekt? Beide Container im `highfishNetwork`? |
 
 ---
