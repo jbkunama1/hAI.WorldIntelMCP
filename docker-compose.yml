@@ -10,9 +10,10 @@ services:
       - highfishNetwork
 
     ports:
-      - "8030:8030" # MCP-Endpoint (Streamable HTTP /mcp via supergateway)
-      - "8031:8031" # Optional: OpenAPI-Endpoint (mcpo, nur mit ENABLE_MCPO=true)
-      - "8501:8501" # Ops-Center-Dashboard (SSE-Live-Feeds)
+      # Host- und Container-Port folgen beide der jeweiligen Env-Variable
+      - "${MCP_HTTP_PORT:-8030}:${MCP_HTTP_PORT:-8030}" # MCP-Endpoint (Streamable HTTP /mcp via supergateway)
+      - "${MCPO_PORT:-8031}:${MCPO_PORT:-8031}" # Optional: OpenAPI-Endpoint (mcpo, nur mit ENABLE_MCPO=true)
+      - "${DASHBOARD_PORT:-8501}:${DASHBOARD_PORT:-8501}" # Ops-Center-Dashboard (SSE-Live-Feeds)
 
     # Cache (SQLite), Vektor-Store-Daten und Reports — überlebt Restarts
     volumes:
@@ -26,7 +27,7 @@ services:
       MCP_API_KEY: "${MCP_API_KEY:-}"
       # Collector-Daemon: fuellt den Qdrant-Vektor-Store im 5-Min-Intervall
       ENABLE_COLLECTOR: "${ENABLE_COLLECTOR:-false}"
-      # Zusaetzlicher OpenAPI-Endpoint (mcpo) auf :8031
+      # Zusaetzlicher OpenAPI-Endpoint (mcpo) auf :${MCPO_PORT}
       ENABLE_MCPO: "${ENABLE_MCPO:-false}"
       # Nur mit Profil "vector" relevant
       QDRANT_URL: "${QDRANT_URL:-}"
