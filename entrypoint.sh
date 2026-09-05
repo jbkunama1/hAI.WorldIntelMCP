@@ -2,8 +2,10 @@
 set -e
 
 : "${MCP_HTTP_PORT:=8030}"
+: "${MCPO_PORT:=8031}"
 : "${DASHBOARD_PORT:=8501}"
 : "${ENABLE_COLLECTOR:=false}"
+: "${ENABLE_MCPO:=false}"
 
 export XDG_CACHE_HOME=/data/cache
 mkdir -p /data/cache /data/reports
@@ -18,11 +20,18 @@ fi
 echo "[entrypoint] starting dashboard on :${DASHBOARD_PORT}"
 intel-dashboard --port "$DASHBOARD_PORT" &
 
-# MCP-Server (stdio) via mcpo als HTTP/OpenAPI-Endpoint exponieren (foreground)
-if [ -n "$MCP_API_KEY" ]; then
-  echo "[entrypoint] starting mcpo on :${MCP_HTTP_PORT} (api key set)"
-  exec mcpo --api-key "$MCP_API_KEY" --port "$MCP_HTTP_PORT" -- world-intel-mcp
-else
-  echo "[entrypoint] starting mcpo on :${MCP_HTTP_PORT} (no auth)"
-  exec mcpo --port "$MCP_HTTP_PORT" -- world-intel-mcp
+# Optional: mcpo als zusaetzlicher OpenAPI-Endpoint (mit optionalem API-Key)
+if [ "$ENABLE_MCPO" = "true" ]; then
+  if [ -n "$MCP_API_KEY" ]; then
+    echo "[entrypoint] starting mcpo (OpenAPI) on :${MCPO_PORT} (api key set)"
+    mcpo --api-key "$MCP_API_KEY" --port "$MCPO_PORT" -- world-intel-mcp &
+  else
+    echo "[entrypoint] starting mcpo (OpenAPI) on :${MCPO_PORT} (no auth)"
+    mcpo --port "$MCPO_PORT" -- world-intel-mcp &
+  fi
 fi
+
+# MCP-Server (stdio) via supergateway als Streamable-HTTP-Endpoint exponieren (foreground)
+# Endpoint: http://<host>:${MCP_HTTP_PORT}/mcp  (stateless, mehrere Clients parallel)
+echo "[entrypoint] starting supergateway (streamable HTTP /mcp) on :${MCP_HTTP_PORT}"
+exec supergateway --stdio "world-intel-mcp" --outputTransport streamableHttp --port "$MCP_HTTP_PORT" --streamableHttpPath /mcp

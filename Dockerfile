@@ -5,8 +5,11 @@ FROM python:3.12-slim
 # Upstream-Ref pinbar: --build-arg WORLD_INTEL_REF=v0.3.0
 ARG WORLD_INTEL_REF=main
 
+# git: Upstream klonen · Node 22: supergateway (stdio -> Streamable HTTP)
 RUN apt-get update \
- && apt-get install -y --no-install-recommends git \
+ && apt-get install -y --no-install-recommends git ca-certificates curl \
+ && curl -fsSL https://deb.nodesource.com/setup_22.x | bash - \
+ && apt-get install -y --no-install-recommends nodejs \
  && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /opt
@@ -16,21 +19,25 @@ RUN git clone --depth 1 --branch "${WORLD_INTEL_REF}" https://github.com/marc-sh
 WORKDIR /opt/world-intel-mcp
 
 # Kern + Dashboard (SSE Ops-Center) + Vektor-Store (Qdrant/FastEmbed)
-# mcpo: exponiert den stdio-MCP-Server als HTTP/OpenAPI-Endpoint
+# supergateway: exponiert den stdio-MCP-Server als Streamable HTTP (/mcp)
+# mcpo: optionaler OpenAPI-Endpoint (ENABLE_MCPO=true)
 RUN pip install --no-cache-dir -e ".[dashboard,vector]" \
- && pip install --no-cache-dir mcpo
+ && pip install --no-cache-dir mcpo \
+ && npm install -g supergateway
 
 COPY entrypoint.sh /entrypoint.sh
 RUN chmod +x /entrypoint.sh \
  && mkdir -p /data/cache /data/reports
 
-EXPOSE 8030 8501
+EXPOSE 8030 8031 8501
 
 # Standard-Umgebungsvariablen (über Portainer/Compose überschreibbar)
 ENV MCP_HTTP_PORT=8030 \
+    MCPO_PORT=8031 \
     DASHBOARD_PORT=8501 \
     MCP_API_KEY="" \
     ENABLE_COLLECTOR=false \
+    ENABLE_MCPO=false \
     QDRANT_URL="" \
     XDG_CACHE_HOME=/data/cache \
     STREAMLIT_SERVER_ADDRESS=0.0.0.0 \

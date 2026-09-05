@@ -84,16 +84,17 @@
  <div class="wrap">
  <span class="badge">🌍 Docker ready · GHCR published</span>
  <h1>hAI.<span class="grad">WorldIntelMCP</span></h1>
- <p class="tagline">120 MCP-Tools für Echtzeit-Global-Intelligence: 📈 Märkte, ⚔️ Konflikte, 🛩️ Militär, 🌋 Katastrophen, 🦠 Cyber und 📰 News — als Portainer-Stack, exponiert via mcpo, mit Ops-Center-Dashboard und optionalem Qdrant-Vektor-Store.</p>
+ <p class="tagline">120 MCP-Tools für Echtzeit-Global-Intelligence: 📈 Märkte, ⚔️ Konflikte, 🛩️ Militär, 🌋 Katastrophen, 🦠 Cyber und 📰 News — als Portainer-Stack, exponiert via supergateway als Streamable-HTTP-Endpoint (/mcp), mit Ops-Center-Dashboard und optionalem Qdrant-Vektor-Store.</p>
  <div class="cta">
  <a class="btn btn-primary" href="https://github.com/jbkunama1/hAI.WorldIntelMCP">View on GitHub</a>
  <a class="btn btn-ghost" href="https://github.com/jbkunama1/hAI.WorldIntelMCP/pkgs/container/hai.worldintelmcp">🐳 GHCR image</a>
  <a class="btn btn-ghost" href="https://github.com/jbkunama1/hAI.WorldIntelMCP#-installation">🚀 Deploy with Portainer</a>
  </div>
  <div class="pills">
- <span class="pill"><span class="dot accent"></span>🔌 MCP via mcpo :8030</span>
+ <span class="pill"><span class="dot accent"></span>🔌 Streamable /mcp :8030</span>
  <span class="pill"><span class="dot ok"></span>📟 Dashboard :8501</span>
  <span class="pill"><span class="dot accent"></span>🌍 120 Tools / 30+ Domänen</span>
+ <span class="pill"><span class="dot warn"></span>📘 OpenAPI optional :8031</span>
  <span class="pill"><span class="dot warn"></span>🗃 Qdrant optional</span>
  <span class="pill"><span class="dot ok"></span>🐖 TruffleHog-Scan</span>
  <span class="pill">📄 MIT license</span>
@@ -107,8 +108,8 @@
  <p class="sub">Ein Container, 120 Tools — vom stdio-MCP-Server bis zu 46+ öffentlichen Quellen. Alle Datenquellen kostenlos, keine API-Keys nötig.</p>
  <div class="diagram">
  <div class="layer"><span class="node">🤖 MCP client / AnythingMCP / Agenten</span></div>
- <div class="arrow">🔌 HTTP (OpenAPI via mcpo)</div>
- <div class="layer"><span class="node core">🌍 world-intel-mcp :8030 — 120 MCP-Tools (stdio) via mcpo</span></div>
+ <div class="arrow">🔌 Streamable HTTP (POST /mcp, via supergateway)</div>
+ <div class="layer"><span class="node core">🌍 world-intel-mcp :8030/mcp — 120 MCP-Tools (stdio) via supergateway</span></div>
  <div class="arrow">Fetcher → CircuitBreaker → Cache (SQLite) → 🗃 optional Qdrant</div>
  <div class="layer">
  <span class="node">📈 Yahoo Finance · SEC EDGAR · FRED</span>
@@ -124,7 +125,8 @@
  <div class="layer">
  <span class="node admin">📟 Ops-Center-Dashboard :8501</span>
  <span class="node admin">🔄 Collector (optional, 5-Min-Intervall)</span>
- <span class="node admin">🗃 Qdrant (Profil „vector")</span>
+ <span class="node admin">🗃 Qdrant (Profil „vector“)</span>
+ <span class="node admin">📘 mcpo OpenAPI :8031 (optional)</span>
  </div>
  </div>
  </div>
@@ -137,27 +139,27 @@
  <div class="grid">
  <div class="card">
  <h3>🌍 Global Intelligence</h3>
- <p>120 MCP-Tools über 30+ Domänen: 📈 Finanzmärkte, 💼 SEC-Filings, ⚔️ Konflikte, 🛩️ Militär-Flüge, 🌋 Erdbeben &amp; Brände, 🦠 Cyber-Threats, 📰 News, 🗺️ Geospatial-Daten.</p>
+ <p>120 MCP-Tools über 30+ Domänen: 📈 Finanzmärkte, 💼 SEC-Filings, ⚔️ Konflikte, 🛩️ Militär-Flüge, 🌋 Erdbeben & Brände, 🦠 Cyber-Threats, 📰 News, 🗺️ Geospatial-Daten.</p>
  </div>
  <div class="card">
- <h3>🔌 MCP via mcpo</h3>
- <p>Der stdio-MCP-Server wird über <code>mcpo</code> als HTTP/OpenAPI-Endpoint auf <code>:8030</code> exponiert. OpenAPI-Doku unter <code>/docs</code>, Beschreibung unter <code>/openapi.json</code>. Optional per <code>MCP_API_KEY</code> geschützt.</p>
+ <h3>🔌 Streamable HTTP /mcp</h3>
+ <p>Der stdio-MCP-Server wird per <code>supergateway</code> als Streamable-HTTP-Endpoint auf <code>:8030/mcp</code> exponiert — stateless, für beliebig viele Clients parallel. Kein 404-„Not Found“ mehr beim POST auf den MCP-Endpoint.</p>
  </div>
  <div class="card">
  <h3>📟 Ops-Center-Dashboard</h3>
  <p>Leaflet-Map mit umschaltbaren Layern (Quakes, Military, Conflict, Fires, Convergence, Nuclear, Infrastructure), 47 Live-SSE-Feeds, HUD-Bar und Circuit-Breaker-Health pro Quelle — auf <code>:8501</code>.</p>
  </div>
  <div class="card">
+ <h3>📘 OpenAPI optional</h3>
+ <p>Mit <code>ENABLE_MCPO=true</code> startet zusätzlich <code>mcpo</code> auf <code>:8031</code>: jeder der 120 Tools als eigener REST-Endpunkt, Doku unter <code>/docs</code>, schützbar per <code>MCP_API_KEY</code>.</p>
+ </div>
+ <div class="card">
  <h3>🗃 Qdrant Vektor-Store</h3>
- <p>Semantische Suche über angesammelte Intelligence („Militäraktivität nahe Taiwan"). Optionaler Qdrant-Service über das Compose-Profil <code>vector</code>, Collector-Daemon befüllt den Store im 5-Min-Intervall.</p>
+ <p>Semantische Suche über angesammelte Intelligence („Militäraktivität nahe Taiwan“). Optionaler Qdrant-Service über das Compose-Profil <code>vector</code>, Collector-Daemon befällt den Store im 5-Min-Intervall.</p>
  </div>
  <div class="card">
  <h3>🚀 Portainer + GHCR</h3>
  <p>Published als <code>ghcr.io/jbkunama1/hai.worldintelmcp:latest</code>, deploybar als Stack direkt aus dem Repository — inkl. Volume für Cache, Reports und Vektor-Store-Daten.</p>
- </div>
- <div class="card">
- <h3>🔐 Sicherheit</h3>
- <p>Keine externen API-Keys nötig — alle Quellen öffentlich. <code>MCP_API_KEY</code> schützt den Endpoint als Bearer-Token, TruffleHog scannt jeden Push auf versehentlich eingecheckte Secrets.</p>
  </div>
  </div>
  </div>
@@ -171,7 +173,7 @@
  <li><b>Portainer:</b> Stacks → Add stack → <b>Repository</b></li>
  <li>Repository-URL: <span class="mono">https://github.com/jbkunama1/hAI.WorldIntelMCP.git</span></li>
  <li>Compose-Pfad: <span class="mono">docker-compose.yml</span> · Branch: <span class="mono">main</span></li>
- <li>Umgebungsvariablen setzen — mindestens <span class="mono">MCP_API_KEY</span> 🔑</li>
+ <li>Umgebungsvariablen setzen — optional <span class="mono">ENABLE_MCPO=true</span> für den OpenAPI-Endpoint</li>
  <li><b>Deploy</b> — das GHCR-Image wird automatisch gepullt 🎉</li>
  </ol>
  <div class="code"><pre><span style="color:var(--muted)"># Docker-Netzwerk (falls nicht vorhanden)</span>
@@ -181,7 +183,6 @@ docker network create highfishNetwork
 docker run -d --name world-intel-mcp \
   -p 8030:8030 -p 8501:8501 \
   -v ./data:/data \
-  -e MCP_API_KEY=ChangeMe \
   ghcr.io/jbkunama1/hai.worldintelmcp:latest</pre></div>
  <p class="note">💡 Upstream-Version pinnen beim Selbstbauen: <span class="mono">docker build --build-arg WORLD_INTEL_REF=v0.3.0 -t hai.worldintelmcp .</span></p>
  </div>
@@ -190,12 +191,14 @@ docker run -d --name world-intel-mcp \
 <section>
  <div class="wrap">
  <h2>🔧 Environment variables</h2>
- <p class="sub">Alle Variablen optional außer <var>MCP_API_KEY</var> (empfohlen, sobald der Endpoint aus dem LAN heraus erreichbar ist).</p>
+ <p class="sub">Alle Variablen optional — Defaults funktionieren out of the box.</p>
  <table>
  <tr><th>Variable</th><th>Pflicht</th><th>Default</th><th>Zweck</th></tr>
- <tr><td><var>MCP_HTTP_PORT</var></td><td>–</td><td>8030</td><td>🔌 MCP-Endpoint (HTTP/OpenAPI via mcpo)</td></tr>
+ <tr><td><var>MCP_HTTP_PORT</var></td><td>–</td><td>8030</td><td>🔌 Streamable-HTTP-Endpoint /mcp (supergateway)</td></tr>
+ <tr><td><var>MCPO_PORT</var></td><td>–</td><td>8031</td><td>📘 Optionaler OpenAPI-Endpoint (mcpo)</td></tr>
  <tr><td><var>DASHBOARD_PORT</var></td><td>–</td><td>8501</td><td>📟 Ops-Center-Dashboard (SSE)</td></tr>
- <tr><td><var>MCP_API_KEY</var></td><td>⚠️ empfohlen</td><td>(leer)</td><td>🔑 API-Key für den MCP-Endpoint (leer = keine Auth)</td></tr>
+ <tr><td><var>MCP_API_KEY</var></td><td>–</td><td>(leer)</td><td>🔑 API-Key für den mcpo-OpenAPI-Endpoint (leer = keine Auth)</td></tr>
+ <tr><td><var>ENABLE_MCPO</var></td><td>–</td><td>false</td><td>📘 mcpo-OpenAPI-Endpoint zusätzlich starten</td></tr>
  <tr><td><var>ENABLE_COLLECTOR</var></td><td>–</td><td>false</td><td>🔄 Collector-Daemon: füllt Qdrant im 5-Min-Intervall</td></tr>
  <tr><td><var>QDRANT_URL</var></td><td>–</td><td>(leer)</td><td>🗃 z. B. http://world-intel-qdrant:6333 (Profil „vector“)</td></tr>
  <tr><td><var>TZ</var></td><td>–</td><td>Europe/Berlin</td><td>🕐 Zeitzone</td></tr>
@@ -209,20 +212,20 @@ docker run -d --name world-intel-mcp \
  <p class="sub">Gesamt: 120 Tools über 30+ Domänen — die vollständige Tool-Referenz steht im <a href="https://github.com/marc-shade/world-intel-mcp" style="color:var(--accent)">Upstream-README</a>.</p>
  <table>
  <tr><th>Domäne</th><th>🛠️ Tools</th><th>Quellen (Beispiele)</th></tr>
- <tr><td>📈 Finanzmärkte &amp; Forex</td><td>12</td><td>Yahoo Finance, CoinGecko, ECB/Frankfurter</td></tr>
- <tr><td>💼 Bonds, Earnings &amp; SEC</td><td>7</td><td>FRED, SEC EDGAR (Full-Text, 8-K)</td></tr>
- <tr><td>🏦 Makro &amp; Notenbanken</td><td>8</td><td>FRED, World Bank, 15 Zentralbanken</td></tr>
- <tr><td>⚔️ Konflikte &amp; Sicherheit</td><td>4</td><td>ACLED, UCDP, Unrest-Detection</td></tr>
- <tr><td>🛩️ Militär &amp; Verteidigung</td><td>6</td><td>adsb.lol, OpenSky, hexdb.io, Surge-Detection</td></tr>
- <tr><td>🌋 Naturkatastrophen &amp; Klima</td><td>7</td><td>USGS, NASA FIRMS/EONET, GDACS, Open-Meteo</td></tr>
- <tr><td>🌐 Infrastruktur &amp; Maritime</td><td>6</td><td>Cloudflare Radar, Seekabel, NGA, FAA</td></tr>
- <tr><td>📰 News &amp; Medien</td><td>3</td><td>119 RSS-Feeds (4-Tier), GDELT, Trends</td></tr>
- <tr><td>🧠 Analyse &amp; Synthese</td><td>12+</td><td>Signal-Konvergenz, Instabilitätsindex, Eskalation</td></tr>
+ <tr><td>📈 Finanzmärkte & Forex</td><td>12</td><td>Yahoo Finance, CoinGecko, ECB/Frankfurter</td></tr>
+ <tr><td>💼 Bonds, Earnings & SEC</td><td>7</td><td>FRED, SEC EDGAR (Full-Text, 8-K)</td></tr>
+ <tr><td>🏦 Makro & Notenbanken</td><td>8</td><td>FRED, World Bank, 15 Zentralbanken</td></tr>
+ <tr><td>⚔️ Konflikte & Sicherheit</td><td>4</td><td>ACLED, UCDP, Unrest-Detection</td></tr>
+ <tr><td>🛩️ Militär & Verteidigung</td><td>6</td><td>adsb.lol, OpenSky, hexdb.io, Surge-Detection</td></tr>
+ <tr><td>🌋 Naturkatastrophen & Klima</td><td>7</td><td>USGS, NASA FIRMS/EONET, GDACS, Open-Meteo</td></tr>
+ <tr><td>🌐 Infrastruktur & Maritime</td><td>6</td><td>Cloudflare Radar, Seekabel, NGA, FAA</td></tr>
+ <tr><td>📰 News & Medien</td><td>3</td><td>119 RSS-Feeds (4-Tier), GDELT, Trends</td></tr>
+ <tr><td>🧠 Analyse & Synthese</td><td>12+</td><td>Signal-Konvergenz, Instabilitätsindex, Eskalation</td></tr>
  <tr><td>🗺️ Geospatial</td><td>11</td><td>Basen, Häfen, Pipelines, Kernkraft, Rechenzentren</td></tr>
- <tr><td>🦠 Cyber &amp; Health</td><td>2</td><td>URLhaus, CISA KEV, WHO DON, ProMED</td></tr>
- <tr><td>🤖 KI &amp; Technologie</td><td>4</td><td>arXiv, HuggingFace, Hacker News, GitHub Trending</td></tr>
+ <tr><td>🦠 Cyber & Health</td><td>2</td><td>URLhaus, CISA KEV, WHO DON, ProMED</td></tr>
+ <tr><td>🤖 KI & Technologie</td><td>4</td><td>arXiv, HuggingFace, Hacker News, GitHub Trending</td></tr>
  <tr><td>🔎 Vektor-Suche (Qdrant)</td><td>5</td><td>semantische Suche, Timeline, Stats</td></tr>
- <tr><td>📡 AOI-Geofences &amp; Briefings</td><td>7+</td><td>eigene Zonen, zitierte Briefings, Daily Digest</td></tr>
+ <tr><td>📡 AOI-Geofences & Briefings</td><td>7+</td><td>eigene Zonen, zitierte Briefings, Daily Digest</td></tr>
  </table>
  </div>
 </section>
@@ -230,18 +233,18 @@ docker run -d --name world-intel-mcp \
 <section>
  <div class="wrap">
  <h2>🔌 MCP-Clients anbinden</h2>
- <p class="sub">mcpo exponiert jedes Tool als eigenen HTTP-Endpunkt — OpenAPI-Doku unter <span class="mono">/docs</span>, Beschreibung unter <span class="mono">openapi.json</span>.</p>
+ <p class="sub">Streamable HTTP auf <span class="mono">:8030/mcp</span> für MCP-Clients — optional OpenAPI via mcpo auf <span class="mono">:8031</span>.</p>
  <div class="code"><pre>{
  "mcpServers": {
  "world-intel": {
  "name": "World Intel MCP",
  "type": "streamable",
- "url": "http://world-intel-mcp:8030",
+ "url": "http://<host>:8030/mcp",
  "enabled": true
  }
  }
 }</pre></div>
- <p class="note">🔐 Mit gesetztem <span class="mono">MCP_API_KEY</span> senden Clients <span class="mono">Authorization: Bearer &lt;KEY&gt;</span>. Das Dashboard (:8501) hat keine eigene Auth — nur im LAN oder hinter Cloudflare Tunnel betreiben.</p>
+ <p class="note">🔐 Der Streamable-Endpoint /mcp hat keine eigene Auth — nur im LAN oder hinter Cloudflare Access/Tunnel betreiben. Den optionalen OpenAPI-Endpoint (:8031) schützt <span class="mono">MCP_API_KEY</span> als Bearer-Token.</p>
  <div class="code"><pre><span style="color:var(--muted)"># CLI direkt im Container:</span>
 docker exec -it world-intel-mcp intel markets
 docker exec -it world-intel-mcp intel earthquakes --min-mag 5.0

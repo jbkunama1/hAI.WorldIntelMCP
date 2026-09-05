@@ -10,7 +10,8 @@ services:
       - highfishNetwork
 
     ports:
-      - "8030:8030" # MCP-Endpoint (HTTP/OpenAPI via mcpo)
+      - "8030:8030" # MCP-Endpoint (Streamable HTTP /mcp via supergateway)
+      - "8031:8031" # Optional: OpenAPI-Endpoint (mcpo, nur mit ENABLE_MCPO=true)
       - "8501:8501" # Ops-Center-Dashboard (SSE-Live-Feeds)
 
     # Cache (SQLite), Vektor-Store-Daten und Reports — überlebt Restarts
@@ -19,16 +20,19 @@ services:
 
     environment:
       MCP_HTTP_PORT: "${MCP_HTTP_PORT:-8030}"
+      MCPO_PORT: "${MCPO_PORT:-8031}"
       DASHBOARD_PORT: "${DASHBOARD_PORT:-8501}"
-      # Leer = keine Auth. Bitte einen starken Wert setzen, wenn extern erreichbar!
+      # Schuetzt den optionalen mcpo-OpenAPI-Endpoint (leer = keine Auth)
       MCP_API_KEY: "${MCP_API_KEY:-}"
-      # Collector-Daemon: füllt den Qdrant-Vektor-Store im 5-Min-Intervall
+      # Collector-Daemon: fuellt den Qdrant-Vektor-Store im 5-Min-Intervall
       ENABLE_COLLECTOR: "${ENABLE_COLLECTOR:-false}"
+      # Zusaetzlicher OpenAPI-Endpoint (mcpo) auf :8031
+      ENABLE_MCPO: "${ENABLE_MCPO:-false}"
       # Nur mit Profil "vector" relevant
       QDRANT_URL: "${QDRANT_URL:-}"
       TZ: "${TZ:-Europe/Berlin}"
 
-  # --- Optional: Qdrant Vektor-Store für semantische Suche ---
+  # --- Optional: Qdrant Vektor-Store fuer semantische Suche ---
   # Aktivierung: docker compose --profile vector up -d
   # plus QDRANT_URL=http://world-intel-qdrant:6333 in der .env
   qdrant:
