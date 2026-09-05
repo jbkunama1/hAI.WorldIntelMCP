@@ -26,6 +26,7 @@
 - [🚀 Installation](#-installation)
 - [🔧 Env-Variablen & Ports](#-env-variablen--ports)
 - [🔌 MCP-Clients anbinden](#-mcp-clients-anbinden)
+- [💬 Beispiel-Abfragen](#-beispiel-abfragen)
 - [🗃 Qdrant & Collector](#-qdrant--collector)
 - [📟 Dashboard & CLI](#-dashboard--cli)
 - [🧭 Troubleshooting](#-troubleshooting)
@@ -58,6 +59,7 @@ ACLED · GDELT · adsb.lol · OpenSky · Cloudflare Radar · WHO · NOAA · …
 | 🐳 **Dockerfile** | Klont das Upstream-Projekt zur Build-Zeit (per `WORLD_INTEL_REF` pinbar), installiert `.[dashboard,vector]` + supergateway & mcpo |
 | 🔌 **supergateway** | Exponiert den stdio-Server als **Streamable HTTP** auf `:8030/mcp` — stateless, beliebig viele Clients parallel |
 | 📘 **mcpo (optional)** | OpenAPI-Endpoint auf `:8031` (per `MCPO_PORT` frei wählbar), schützbar per `MCP_API_KEY` |
+| 📄 **instructions.md** | Agent-Anleitung: Verbindung, Tool-Domains, Usage-Guidelines, Beispiel-Fragen — damit Agenten wissen, was der MCP kann |
 | 📦 **Portainer-Stack** | `docker-compose.yml` — deploybar direkt aus dem Repository, **alle Ports per Env konfigurierbar** |
 | 🚀 **GHCR-Image** | GitHub Actions pusht nach `ghcr.io/jbkunama1/hai.worldintelmcp:latest` |
 | 🐖 **TruffleHog-Workflow** | Secret-Scan bei jedem Push/PR |
@@ -197,6 +199,25 @@ Mit `ENABLE_MCPO=true` startet zusätzlich **mcpo** auf `:8031` (per `MCPO_PORT`
 - 🔑 Schützbar per `MCP_API_KEY` (Clients senden `Authorization: Bearer <KEY>`)
 
 ⚠️ Der Streamable-Endpoint `/mcp` hat **keine eigene Auth** — nur im LAN oder hinter Cloudflare Access/Tunnel betreiben.
+
+---
+
+## 💬 Beispiel-Abfragen
+
+Was Agenten (und du) den Server fragen können — Frage → empfohlene Tools:
+
+| 💬 Frage | 🛠️ Empfohlene Tools |
+|---|---|
+| „Was passiert gerade in der Welt?" | Daily Digest / World Brief (zitierte Gesamtübersicht über alle Domänen) |
+| „Wie steht der Markt heute?" | `intel_market_quotes`, `intel_macro_signals`, `intel_macro_composite` |
+| „Was läuft militärisch im Mittelmeer / Nahen Osten?" | `intel_theater_posture`, `intel_military_flights`, `intel_military_surge` |
+| „Gab es heute starke Erdbeben oder Waldbrände?" | `intel_earthquakes` (min. Magnitude setzen), `intel_wildfires` |
+| „Gibt es Eskalationssignale in <Region>?" | Escalation-Scoring, Signal-Konvergenz, `intel_acled_events` |
+| „Welche Cyber-Bedrohungen sind gerade aktiv?" | URLhaus, Feodotracker, CISA KEV |
+| „Was passiert rund um meine Region / mein Zuhause?" | AOI-Geofence einmal definieren, dann zitierten AOI-Brief abrufen |
+| „Was ist neu bei Firma X (Kurs, SEC, News)?" | `intel_company_profile`, `intel_company_filings`, `intel_recent_8k` |
+
+Die vollständige Agenten-Anleitung mit Usage-Guidelines steht in [instructions.md](instructions.md). 🤖
 
 ---
 

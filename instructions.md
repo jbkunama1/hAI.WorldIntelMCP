@@ -77,12 +77,27 @@ Call a tool (parameter names are authoritative via `tools/list`):
 {"jsonrpc":"2.0","id":3,"method":"tools/call","params":{"name":"intel_earthquakes","arguments":{"min_magnitude":5.0}}}
 ```
 
-## 7. Health & Diagnostics
+## 7. Example Questions (Situational Queries)
+
+Natural-language questions agents can answer with this server, and the recommended tools for each:
+
+| Question | Recommended Tools |
+|---|---|
+| "What is happening in the world right now?" | Daily digest / world brief (cited cross-domain synthesis) |
+| "How are markets doing today?" | `intel_market_quotes`, `intel_macro_signals`, `intel_macro_composite` |
+| "What military activity is there in the Mediterranean / Middle East?" | `intel_theater_posture`, `intel_military_flights`, `intel_military_surge` |
+| "Were there strong earthquakes or wildfires today?" | `intel_earthquakes` (set a minimum magnitude), `intel_wildfires` |
+| "Are there escalation signals in <region>?" | Escalation scoring, signal convergence, `intel_acled_events` |
+| "Which cyber threats are currently active?" | URLhaus, Feodotracker, CISA KEV feeds |
+| "What is happening around <my area>?" | Define an AOI geofence once, then request the cited AOI brief for that zone |
+| "What's new on company X (price, SEC filings, news)?" | `intel_company_profile`, `intel_company_filings`, `intel_recent_8k` |
+
+## 8. Health & Diagnostics
 
 * Operators can check cache and circuit-breaker health via the CLI: `docker exec -it world-intel-mcp intel status`
 * The dashboard on `:8501` shows per-source breaker health for humans.
 
-## 8. Security Notes
+## 9. Security Notes
 
 * Treat `/mcp` as trusted-network only (no built-in auth). For external exposure, the operator should front it with Cloudflare Access or similar.
 * All data is public OSINT — never invent additional “classified” framing for results.
