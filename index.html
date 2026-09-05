@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>hAI.WorldIntelMCP — 120 MCP-Tools für Echtzeit-Global-Intelligence</title>
+<style>
+ :root{
+ --bg:#0a0e16; --bg2:#0f1522; --card:#121a2b; --line:#1e2a3f;
+ --txt:#e6edf7; --muted:#93a3bf; --accent:#38bdf8; --accent2:#8b5cf6;
+ --ok:#34d399; --warn:#fbbf24;
+ }
+ @media (prefers-color-scheme: light){
+ :root{
+ --bg:#f4f7fc; --bg2:#e9eef7; --card:#ffffff; --line:#d8e0ee;
+ --txt:#101828; --muted:#51607a; --accent:#0284c7; --accent2:#7c3aed;
+ --ok:#059669; --warn:#b45309;
+ }
+ }
+ *{box-sizing:border-box;margin:0;padding:0}
+ html{scroll-behavior:smooth}
+ body{
+ font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+ background:radial-gradient(1200px 600px at 80% -10%,rgba(139,92,246,.14),transparent 60%),
+ radial-gradient(900px 500px at 0% 100%,rgba(56,189,248,.10),transparent 55%),
+ var(--bg);
+ color:var(--txt); line-height:1.6;
+ }
+ .wrap{max-width:1080px;margin:0 auto;padding:0 24px}
+ header{padding:72px 0 40px}
+ .badge{
+ display:inline-flex;align-items:center;gap:8px;font-size:13px;font-weight:600;
+ letter-spacing:.08em;text-transform:uppercase;color:var(--accent);
+ background:color-mix(in srgb,var(--accent) 12%,transparent);
+ border:1px solid color-mix(in srgb,var(--accent) 30%,transparent);
+ padding:6px 12px;border-radius:999px;margin-bottom:20px;
+ }
+ h1{font-size:clamp(2.2rem,5vw,3.6rem);line-height:1.1;letter-spacing:-.02em;font-weight:800}
+ h1 .grad{background:linear-gradient(92deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent}
+ .tagline{max-width:680px;margin-top:18px;font-size:1.15rem;color:var(--muted)}
+ .cta{margin-top:28px;display:flex;gap:12px;flex-wrap:wrap}
+ .btn{display:inline-flex;align-items:center;gap:8px;padding:12px 20px;border-radius:12px;font-weight:600;font-size:.95rem;text-decoration:none;transition:transform .15s ease,box-shadow .15s ease}
+ .btn-primary{background:linear-gradient(92deg,var(--accent),var(--accent2));color:#fff;box-shadow:0 8px 24px -8px rgba(99,102,241,.6)}
+ .btn-ghost{border:1px solid var(--line);color:var(--txt)}
+ .btn:hover{transform:translateY(-2px)}
+ .mono{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace}
+ section{padding:36px 0}
+ h2{font-size:1.5rem;margin-bottom:6px;letter-spacing:-.01em}
+ .sub{color:var(--muted);margin-bottom:22px;max-width:720px}
+ .pills{display:flex;flex-wrap:wrap;gap:10px;margin-top:30px}
+ .pill{display:inline-flex;align-items:center;gap:8px;padding:8px 14px;border-radius:999px;font-size:.87rem;font-weight:500;color:var(--txt);background:var(--card);border:1px solid var(--line)}
+ .dot{width:8px;height:8px;border-radius:50%}
+ .dot.ok{background:var(--ok)} .dot.accent{background:var(--accent)} .dot.warn{background:var(--warn)}
+ .diagram{margin:26px 0 8px;padding:24px;border:1px solid var(--line);border-radius:16px;background:var(--card);font-size:.9rem}
+ .diagram .layer{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+ .diagram .node{padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:var(--bg2);font-weight:600;white-space:nowrap}
+ .diagram .node.core{background:color-mix(in srgb,var(--accent2) 14%,var(--bg2))}
+ .diagram .node.admin{border-style:dashed}
+ .diagram .arrow{color:var(--muted);text-align:center;padding:4px 0;font-size:.8rem}
+ .diagram .arrow::before{content:"\2193";display:block;font-size:1.2rem}
+ .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px;margin-top:24px}
+ .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px}
+ .card h3{display:flex;align-items:center;gap:10px;font-size:1.05rem;margin-bottom:10px}
+ .card p{color:var(--muted);font-size:.94rem}
+ .card code{display:inline-block;background:var(--bg2);border:1px solid var(--line);border-radius:6px;padding:1px 7px;font-size:.85em}
+ table{width:100%;border-collapse:collapse;margin-top:22px;font-size:.9rem}
+ th,td{text-align:left;padding:10px 14px;border-bottom:1px solid var(--line)}
+ th{color:var(--muted);font-weight:600;font-size:.82rem;text-transform:uppercase;letter-spacing:.06em}
+ td var{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;font-style:normal;color:var(--accent)}
+ .code{margin-top:22px;padding:18px 20px;border:1px solid var(--line);border-radius:12px;background:var(--bg2);overflow:auto}
+ .code pre{font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,"Liberation Mono",monospace;font-size:.85rem;line-height:1.6}
+ .steps{margin-top:18px;padding-left:22px;color:var(--muted)}
+ .steps li{margin-bottom:8px}
+ .steps b{color:var(--txt)}
+ .note{margin-top:22px;padding:14px 18px;border:1px solid color-mix(in srgb,var(--warn) 35%,transparent);background:color-mix(in srgb,var(--warn) 10%,transparent);border-radius:12px;font-size:.92rem;color:var(--muted)}
+ footer{padding:44px 0 56px;color:var(--muted);font-size:.9rem;border-top:1px solid var(--line);margin-top:48px}
+ footer a{color:var(--accent)}
+ @media (max-width:640px){header{padding:48px 0 28px}.diagram .arrow{display:none}}
+</style>
+</head>
+<body>
+
+<header>
+ <div class="wrap">
+ <span class="badge">🌍 Docker ready · GHCR published</span>
+ <h1>hAI.<span class="grad">WorldIntelMCP</span></h1>
+ <p class="tagline">120 MCP-Tools für Echtzeit-Global-Intelligence: 📈 Märkte, ⚔️ Konflikte, 🛩️ Militär, 🌋 Katastrophen, 🦠 Cyber und 📰 News — als Portainer-Stack, exponiert via mcpo, mit Ops-Center-Dashboard und optionalem Qdrant-Vektor-Store.</p>
+ <div class="cta">
+ <a class="btn btn-primary" href="https://github.com/jbkunama1/hAI.WorldIntelMCP">View on GitHub</a>
+ <a class="btn btn-ghost" href="https://github.com/jbkunama1/hAI.WorldIntelMCP/pkgs/container/hai.worldintelmcp">🐳 GHCR image</a>
+ <a class="btn btn-ghost" href="https://github.com/jbkunama1/hAI.WorldIntelMCP#-installation">🚀 Deploy with Portainer</a>
+ </div>
+ <div class="pills">
+ <span class="pill"><span class="dot accent"></span>🔌 MCP via mcpo :8030</span>
+ <span class="pill"><span class="dot ok"></span>📟 Dashboard :8501</span>
+ <span class="pill"><span class="dot accent"></span>🌍 120 Tools / 30+ Domänen</span>
+ <span class="pill"><span class="dot warn"></span>🗃 Qdrant optional</span>
+ <span class="pill"><span class="dot ok"></span>🐖 TruffleHog-Scan</span>
+ <span class="pill">📄 MIT license</span>
+ </div>
+ </div>
+</header>
+
+<section>
+ <div class="wrap">
+ <h2>⚙️ How it works</h2>
+ <p class="sub">Ein Container, 120 Tools — vom stdio-MCP-Server bis zu 46+ öffentlichen Quellen. Alle Datenquellen kostenlos, keine API-Keys nötig.</p>
+ <div class="diagram">
+ <div class="layer"><span class="node">🤖 MCP client / AnythingMCP / Agenten</span></div>
+ <div class="arrow">🔌 HTTP (OpenAPI via mcpo)</div>
+ <div class="layer"><span class="node core">🌍 world-intel-mcp :8030 — 120 MCP-Tools (stdio) via mcpo</span></div>
+ <div class="arrow">Fetcher → CircuitBreaker → Cache (SQLite) → 🗃 optional Qdrant</div>
+ <div class="layer">
+ <span class="node">📈 Yahoo Finance · SEC EDGAR · FRED</span>
+ <span class="node">⚔️ ACLED · GDELT · UCDP</span>
+ <span class="node">🛩️ adsb.lol · OpenSky</span>
+ </div>
+ <div class="layer">
+ <span class="node">🌋 USGS · NASA FIRMS · GDACS</span>
+ <span class="node">📰 119 RSS-Feeds</span>
+ <span class="node">🌐 Cloudflare Radar · WHO · NOAA</span>
+ </div>
+ <div class="arrow">SSE-Live-Feeds · Leaflet-Map · Breaker-Health</div>
+ <div class="layer">
+ <span class="node admin">📟 Ops-Center-Dashboard :8501</span>
+ <span class="node admin">🔄 Collector (optional, 5-Min-Intervall)</span>
+ <span class="node admin">🗃 Qdrant (Profil „vector")</span>
+ </div>
+ </div>
+ </div>
+</section>
+
+<section>
+ <div class="wrap">
+ <h2>✨ Features</h2>
+ <p class="sub">Alles, was die README verspricht, auf den Punkt.</p>
+ <div class="grid">
+ <div class="card">
+ <h3>🌍 Global Intelligence</h3>
+ <p>120 MCP-Tools über 30+ Domänen: 📈 Finanzmärkte, 💼 SEC-Filings, ⚔️ Konflikte, 🛩️ Militär-Flüge, 🌋 Erdbeben &amp; Brände, 🦠 Cyber-Threats, 📰 News, 🗺️ Geospatial-Daten.</p>
+ </div>
+ <div class="card">
+ <h3>🔌 MCP via mcpo</h3>
+ <p>Der stdio-MCP-Server wird über <code>mcpo</code> als HTTP/OpenAPI-Endpoint auf <code>:8030</code> exponiert. OpenAPI-Doku unter <code>/docs</code>, Beschreibung unter <code>/openapi.json</code>. Optional per <code>MCP_API_KEY</code> geschützt.</p>
+ </div>
+ <div class="card">
+ <h3>📟 Ops-Center-Dashboard</h3>
+ <p>Leaflet-Map mit umschaltbaren Layern (Quakes, Military, Conflict, Fires, Convergence, Nuclear, Infrastructure), 47 Live-SSE-Feeds, HUD-Bar und Circuit-Breaker-Health pro Quelle — auf <code>:8501</code>.</p>
+ </div>
+ <div class="card">
+ <h3>🗃 Qdrant Vektor-Store</h3>
+ <p>Semantische Suche über angesammelte Intelligence („Militäraktivität nahe Taiwan"). Optionaler Qdrant-Service über das Compose-Profil <code>vector</code>, Collector-Daemon befüllt den Store im 5-Min-Intervall.</p>
+ </div>
+ <div class="card">
+ <h3>🚀 Portainer + GHCR</h3>
+ <p>Published als <code>ghcr.io/jbkunama1/hai.worldintelmcp:latest</code>, deploybar als Stack direkt aus dem Repository — inkl. Volume für Cache, Reports und Vektor-Store-Daten.</p>
+ </div>
+ <div class="card">
+ <h3>🔐 Sicherheit</h3>
+ <p>Keine externen API-Keys nötig — alle Quellen öffentlich. <code>MCP_API_KEY</code> schützt den Endpoint als Bearer-Token, TruffleHog scannt jeden Push auf versehentlich eingecheckte Secrets.</p>
+ </div>
+ </div>
+ </div>
+</section>
+
+<section>
+ <div class="wrap">
+ <h2>🚀 Installation</h2>
+ <p class="sub">Drei Wege — Portainer ist der schnellste.</p>
+ <ol class="steps">
+ <li><b>Portainer:</b> Stacks → Add stack → <b>Repository</b></li>
+ <li>Repository-URL: <span class="mono">https://github.com/jbkunama1/hAI.WorldIntelMCP.git</span></li>
+ <li>Compose-Pfad: <span class="mono">docker-compose.yml</span> · Branch: <span class="mono">main</span></li>
+ <li>Umgebungsvariablen setzen — mindestens <span class="mono">MCP_API_KEY</span> 🔑</li>
+ <li><b>Deploy</b> — das GHCR-Image wird automatisch gepullt 🎉</li>
+ </ol>
+ <div class="code"><pre><span style="color:var(--muted)"># Docker-Netzwerk (falls nicht vorhanden)</span>
+docker network create highfishNetwork
+
+<span style="color:var(--muted)"># Oder komplett per docker run:</span>
+docker run -d --name world-intel-mcp \
+  -p 8030:8030 -p 8501:8501 \
+  -v ./data:/data \
+  -e MCP_API_KEY=ChangeMe \
+  ghcr.io/jbkunama1/hai.worldintelmcp:latest</pre></div>
+ <p class="note">💡 Upstream-Version pinnen beim Selbstbauen: <span class="mono">docker build --build-arg WORLD_INTEL_REF=v0.3.0 -t hai.worldintelmcp .</span></p>
+ </div>
+</section>
+
+<section>
+ <div class="wrap">
+ <h2>🔧 Environment variables</h2>
+ <p class="sub">Alle Variablen optional außer <var>MCP_API_KEY</var> (empfohlen, sobald der Endpoint aus dem LAN heraus erreichbar ist).</p>
+ <table>
+ <tr><th>Variable</th><th>Pflicht</th><th>Default</th><th>Zweck</th></tr>
+ <tr><td><var>MCP_HTTP_PORT</var></td><td>–</td><td>8030</td><td>🔌 MCP-Endpoint (HTTP/OpenAPI via mcpo)</td></tr>
+ <tr><td><var>DASHBOARD_PORT</var></td><td>–</td><td>8501</td><td>📟 Ops-Center-Dashboard (SSE)</td></tr>
+ <tr><td><var>MCP_API_KEY</var></td><td>⚠️ empfohlen</td><td>(leer)</td><td>🔑 API-Key für den MCP-Endpoint (leer = keine Auth)</td></tr>
+ <tr><td><var>ENABLE_COLLECTOR</var></td><td>–</td><td>false</td><td>🔄 Collector-Daemon: füllt Qdrant im 5-Min-Intervall</td></tr>
+ <tr><td><var>QDRANT_URL</var></td><td>–</td><td>(leer)</td><td>🗃 z. B. http://world-intel-qdrant:6333 (Profil „vector“)</td></tr>
+ <tr><td><var>TZ</var></td><td>–</td><td>Europe/Berlin</td><td>🕐 Zeitzone</td></tr>
+ </table>
+ </div>
+</section>
+
+<section>
+ <div class="wrap">
+ <h2>🧰 Domänen-Überblick</h2>
+ <p class="sub">Gesamt: 120 Tools über 30+ Domänen — die vollständige Tool-Referenz steht im <a href="https://github.com/marc-shade/world-intel-mcp" style="color:var(--accent)">Upstream-README</a>.</p>
+ <table>
+ <tr><th>Domäne</th><th>🛠️ Tools</th><th>Quellen (Beispiele)</th></tr>
+ <tr><td>📈 Finanzmärkte &amp; Forex</td><td>12</td><td>Yahoo Finance, CoinGecko, ECB/Frankfurter</td></tr>
+ <tr><td>💼 Bonds, Earnings &amp; SEC</td><td>7</td><td>FRED, SEC EDGAR (Full-Text, 8-K)</td></tr>
+ <tr><td>🏦 Makro &amp; Notenbanken</td><td>8</td><td>FRED, World Bank, 15 Zentralbanken</td></tr>
+ <tr><td>⚔️ Konflikte &amp; Sicherheit</td><td>4</td><td>ACLED, UCDP, Unrest-Detection</td></tr>
+ <tr><td>🛩️ Militär &amp; Verteidigung</td><td>6</td><td>adsb.lol, OpenSky, hexdb.io, Surge-Detection</td></tr>
+ <tr><td>🌋 Naturkatastrophen &amp; Klima</td><td>7</td><td>USGS, NASA FIRMS/EONET, GDACS, Open-Meteo</td></tr>
+ <tr><td>🌐 Infrastruktur &amp; Maritime</td><td>6</td><td>Cloudflare Radar, Seekabel, NGA, FAA</td></tr>
+ <tr><td>📰 News &amp; Medien</td><td>3</td><td>119 RSS-Feeds (4-Tier), GDELT, Trends</td></tr>
+ <tr><td>🧠 Analyse &amp; Synthese</td><td>12+</td><td>Signal-Konvergenz, Instabilitätsindex, Eskalation</td></tr>
+ <tr><td>🗺️ Geospatial</td><td>11</td><td>Basen, Häfen, Pipelines, Kernkraft, Rechenzentren</td></tr>
+ <tr><td>🦠 Cyber &amp; Health</td><td>2</td><td>URLhaus, CISA KEV, WHO DON, ProMED</td></tr>
+ <tr><td>🤖 KI &amp; Technologie</td><td>4</td><td>arXiv, HuggingFace, Hacker News, GitHub Trending</td></tr>
+ <tr><td>🔎 Vektor-Suche (Qdrant)</td><td>5</td><td>semantische Suche, Timeline, Stats</td></tr>
+ <tr><td>📡 AOI-Geofences &amp; Briefings</td><td>7+</td><td>eigene Zonen, zitierte Briefings, Daily Digest</td></tr>
+ </table>
+ </div>
+</section>
+
+<section>
+ <div class="wrap">
+ <h2>🔌 MCP-Clients anbinden</h2>
+ <p class="sub">mcpo exponiert jedes Tool als eigenen HTTP-Endpunkt — OpenAPI-Doku unter <span class="mono">/docs</span>, Beschreibung unter <span class="mono">openapi.json</span>.</p>
+ <div class="code"><pre>{
+ "mcpServers": {
+ "world-intel": {
+ "name": "World Intel MCP",
+ "type": "streamable",
+ "url": "http://world-intel-mcp:8030",
+ "enabled": true
+ }
+ }
+}</pre></div>
+ <p class="note">🔐 Mit gesetztem <span class="mono">MCP_API_KEY</span> senden Clients <span class="mono">Authorization: Bearer &lt;KEY&gt;</span>. Das Dashboard (:8501) hat keine eigene Auth — nur im LAN oder hinter Cloudflare Tunnel betreiben.</p>
+ <div class="code"><pre><span style="color:var(--muted)"># CLI direkt im Container:</span>
+docker exec -it world-intel-mcp intel markets
+docker exec -it world-intel-mcp intel earthquakes --min-mag 5.0
+docker exec -it world-intel-mcp intel status</pre></div>
+ </div>
+</section>
+
+<footer>
+ <div class="wrap">
+ <a href="https://github.com/jbkunama1/hAI.WorldIntelMCP">hAI.WorldIntelMCP</a> ·
+ <a href="https://github.com/jbkunama1/hAI.WorldIntelMCP/blob/main/README.md">README</a> ·
+ <a href="https://github.com/marc-shade/world-intel-mcp">Upstream (MIT)</a> ·
+ <a href="https://github.com/jbkunama1/hAI.WorldIntelMCP/blob/main/LICENSE">MIT License</a><br><br>
+ ☕ Teil des highfishNetwork-Stacks — nur in vertrautem Netzwerk oder hinter VPN/HTTPS betreiben.
+ </div>
+</footer>
+
+</body>
+</html>
