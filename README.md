@@ -150,6 +150,8 @@ Default ist `main` — mit `WORLD_INTEL_REF` auf jedes Tag des Upstream-Repos pi
 | `QDRANT_URL` | – | *(leer)* | 🗃 z. B. `http://world-intel-qdrant:6333` (Profil `vector`) |
 | `TZ` | – | `Europe/Berlin` | 🕐 Zeitzone |
 
+ℹ️ Das Dashboard bindet intern auf `0.0.0.0` (`WORLD_INTEL_DASHBOARD_HOST` ist im Image voreingestellt) — der Upstream-Default `127.0.0.1` würde das Port-Mapping ins Leere laufen lassen.
+
 ### 📘 Beispiel: mcpo auf eigenem Port mit API-Key
 
 ```text
@@ -251,9 +253,9 @@ docker exec -it world-intel-mcp intel status
 
 | Symptom | Lösung |
 |---|---|
-| 🔌 `Streamable HTTP error: {"detail":"Not Found"}` bzw. `POST /mcp → 404` | Client POSTet auf einen Pfad ohne MCP-Endpoint. Ursache: ältere Image-Version exponierte nur mcpo (OpenAPI). **Image neu pullen** (`docker pull ghcr.io/jbkunama1/hai.worldintelmcp:latest`) und Client-URL auf `http://<host>:8030/mcp` setzen |
+| 📟 Dashboard nicht erreichbar (Log: `Uvicorn running on http://127.0.0.1:<port>`) | Das Upstream-Dashboard bindet default auf `127.0.0.1` — im Docker-Container dadurch für das Port-Mapping unsichtbar. **Image neu pullen** (Fix setzt `--host 0.0.0.0` + `WORLD_INTEL_DASHBOARD_HOST=0.0.0.0`). Log muss danach `Uvicorn running on http://0.0.0.0:<port>` zeigen |
+| 🔌 `Streamable HTTP error: {"detail":"Not Found"}` bzw. `POST /mcp → 404` | Client POSTet auf einen Pfad ohne MCP-Endpoint. Ursache: ältere Image-Version exponierte nur mcpo (OpenAPI). **Image neu pullen** und Client-URL auf `http://<host>:8030/mcp` setzen |
 | ❌ Image-Pull schlägt fehl | GHCR-Paket im Repo (Packages) auf Public setzen oder per `docker login ghcr.io` einloggen |
-| 📟 Dashboard nicht erreichbar | Port frei? `DASHBOARD_PORT` prüfen, Container-Logs ansehen |
 | 🔌 /mcp liefert Timeout beim Erstconnect | Erster Start initialisiert Quellen/Caches — kurz warten und erneut versuchen |
 | 🐳 Port schon belegt | Env-Variable (`MCP_HTTP_PORT`/`MCPO_PORT`/`DASHBOARD_PORT`) ändern und Stack neu deployen — Host- und Container-Port folgen automatisch, keine Compose-Anpassung nötig |
 | 🗃 Qdrant-Verbindung fehlschlägt | Profil `vector` aktiv? `QDRANT_URL` korrekt? Beide Container im `highfishNetwork`? |

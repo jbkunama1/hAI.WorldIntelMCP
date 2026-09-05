@@ -32,15 +32,16 @@ RUN chmod +x /entrypoint.sh \
 EXPOSE 8030 8031 8501
 
 # Standard-Umgebungsvariablen (über Portainer/Compose überschreibbar)
+# WICHTIG: Das Upstream-Dashboard (Starlette/Uvicorn) bindet default auf 127.0.0.1 —
+# ohne WORLD_INTEL_DASHBOARD_HOST=0.0.0.0 ist es außerhalb des Containers unerreichbar!
 ENV MCP_HTTP_PORT=8030 \
     MCPO_PORT=8031 \
     DASHBOARD_PORT=8501 \
+    WORLD_INTEL_DASHBOARD_HOST=0.0.0.0 \
     MCP_API_KEY="" \
     ENABLE_COLLECTOR=false \
     ENABLE_MCPO=false \
     QDRANT_URL="" \
-    XDG_CACHE_HOME=/data/cache \
-    STREAMLIT_SERVER_ADDRESS=0.0.0.0 \
-    STREAMLIT_SERVER_HEADLESS=true
+    XDG_CACHE_HOME=/data/cache
 
 ENTRYPOINT ["/entrypoint.sh"]

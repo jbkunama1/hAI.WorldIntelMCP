@@ -7,6 +7,8 @@ set -e
 : "${ENABLE_COLLECTOR:=false}"
 : "${ENABLE_MCPO:=false}"
 
+# Upstream-Dashboard bindet default auf 127.0.0.1 — fuer Docker zwingend 0.0.0.0
+export WORLD_INTEL_DASHBOARD_HOST=0.0.0.0
 export XDG_CACHE_HOME=/data/cache
 mkdir -p /data/cache /data/reports
 
@@ -16,9 +18,9 @@ if [ "$ENABLE_COLLECTOR" = "true" ]; then
   python /opt/world-intel-mcp/collector.py &
 fi
 
-# Ops-Center-Dashboard im Hintergrund (SSE-Live-Feeds)
-echo "[entrypoint] starting dashboard on :${DASHBOARD_PORT}"
-intel-dashboard --port "$DASHBOARD_PORT" &
+# Ops-Center-Dashboard im Hintergrund (Starlette/Uvicorn, --host bewusst gesetzt)
+echo "[entrypoint] starting dashboard on 0.0.0.0:${DASHBOARD_PORT}"
+intel-dashboard --host 0.0.0.0 --port "$DASHBOARD_PORT" &
 
 # Optional: mcpo als zusaetzlicher OpenAPI-Endpoint (mit optionalem API-Key)
 if [ "$ENABLE_MCPO" = "true" ]; then
